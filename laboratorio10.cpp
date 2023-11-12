@@ -1,14 +1,14 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <stack>
 using namespace std;
 
-class Graph
+class MatrixGraph
 {
 	public:
-		Graph(vector<vector<int>> p) { paths = p; }
-		~Graph(){};
-		vector<vector<int>> getPath() { return paths; }
+		MatrixGraph(vector<vector<int>> p) { paths = p; }
+		~MatrixGraph(){};
 		
 		void addEdge(int u, int v)
 		{
@@ -18,12 +18,20 @@ class Graph
 		
 		void printGraph()
 		{
+			int count=0;
 			cout << "Matriz de Adyacencia:\n";
+			cout << "  ";
+			for (int i=0; i<8; i++)
+				cout << i << " ";
+			cout << endl;
 			for (vector<int> row : paths)
 			{
+				cout << count << " ";
 				for (int val : row)
+				{
 					cout << val << " ";
-					
+				}
+				count++;
 				cout << "\n";
 			}
 		}
@@ -40,34 +48,41 @@ class Graph
 		void findPath(int start, int end)
 		{
 			vector<bool> visited(8,false);
-			vector<int> path(8,0);
-			stack<int> stack;
+			vector<int> parent(8,-1);
+			vector<int> path;
+			queue<int> queue;
 			
-			stack.push(start);
+			queue.push(start);
 			visited[start] = true;
 			
-			while (!stack.empty())
+			while (!queue.empty())
 			{
-				int curr = stack.top();
-				stack.pop();
-				path.push_back(curr);
+				int curr = queue.front();
+				queue.pop();
 				
 				if (curr == end)
 				{
 					cout << "Camino Encontrado: ";
-					for (int vertex : path)
-						cout << vertex << " ";
-					cout << endl;
+					for (int i=end; i != -1; i = parent[i])
+						path.push_back(i);
+						
+					for (int i=path.size()-1;i>-1;i--)
+					{
+						cout << path[i];
+						if (i>0)
+							cout << " -> ";
+					}
 					
 					return;
 				}
 				
-				for (int adj : paths[curr])
+				for (int i=0; i<8; i++)
 				{
-					if (!visited[adj] && areAdjacent(adj, curr))
+					if (!visited[i] && areAdjacent(i, curr))
 					{
-						stack.push(adj);
-						visited[adj] = true;
+						queue.push(i);
+						visited[i] = true;
+						parent[i] = curr;
 					}
 				}
 			}
@@ -80,42 +95,142 @@ class Graph
 		vector<vector<int>> paths;
 };
 
-//void add_path()
+class ListGraph
+{
+	public:
+		ListGraph(vector<vector<pair<int, int>>> p) { paths = p; }
+		~ListGraph(){}
+		
+		void AddEdge(int u, int v, int weight)
+		{
+			paths[u].push_back(make_pair(v, weight));
+			paths[v].push_back(make_pair(u, weight));
+		}
+		
+		void PrintGraph()
+		{
+			for (int i=0; i<8; i++)
+			{
+				cout << "Nodo " << i << ": ";
+				for (const auto& adj : paths[i])
+					cout << "("<< adj.first << ", " << adj.second << ")";
+				cout << endl;
+			}
+		}
+		
+		bool AreAdjacent(int u, int v)
+		{
+			for (const auto& i : paths[u])
+				if (i.first == v)
+					return true;
+					
+			return false;
+		}
+		
+		bool FindPath(int start, int end)
+		{
+			vector<bool> visited(8, false);
+			stack<int> stack;
+			
+			stack.push(start);
+			visited[start] = true;
+			
+			while(!stack.empty())
+			{
+				int curr = stack.top();
+				stack.pop();
+				
+				if (curr == end)
+					return true;
+				
+				for (const auto& adj : paths[curr])
+				{
+					if (!visited[adj.first])
+					{
+						stack.push(adj.first);
+						visited[adj.first] = true;
+					}
+				}
+			}
+			
+			return false;
+		}
+		
+	private:
+		vector<vector<pair<int, int>>> paths;
+};
 
 int main()
 {
-	// Create an empty adjacency matrix
-	vector<vector<int>> graph(8, vector<int>(8, 0));
-	Graph attempt(graph);
+	// ejercicios con matriz de adyacencia
+	vector<vector<int>> matrix(8, vector<int>(8, 0));
+	MatrixGraph matrixGraph(matrix);
 	
-	attempt.addEdge(0,2);
-	attempt.addEdge(0,3);
-	attempt.addEdge(0,4);
-	attempt.addEdge(1,2);
-	attempt.addEdge(1,3);
-	attempt.addEdge(1,4);
-	attempt.addEdge(1,5);
-	attempt.addEdge(1,6);
-	attempt.addEdge(2,5);
-	attempt.addEdge(2,6);
-	attempt.addEdge(3,6);
-	attempt.addEdge(3,7);
-	attempt.addEdge(4,5);
-	attempt.addEdge(4,7);
-	attempt.addEdge(6,7);
-	attempt.printGraph();
+	matrixGraph.addEdge(0,2);
+	matrixGraph.addEdge(0,3);
+	matrixGraph.addEdge(0,4);
+	matrixGraph.addEdge(1,2);
+	matrixGraph.addEdge(1,3);
+	matrixGraph.addEdge(1,4);
+	matrixGraph.addEdge(1,5);
+	matrixGraph.addEdge(1,6);
+	matrixGraph.addEdge(2,5);
+	matrixGraph.addEdge(2,6);
+	matrixGraph.addEdge(3,6);
+	matrixGraph.addEdge(3,7);
+	matrixGraph.addEdge(4,5);
+	matrixGraph.addEdge(4,7);
+	matrixGraph.addEdge(6,7);
+	matrixGraph.printGraph();
 	
-	if (attempt.areAdjacent(1,3))
+	if (matrixGraph.areAdjacent(1,3))
 		cout << "Son Adyacentes" << endl;
 	else
 		cout << "No Son Adyacentes" << endl;
 		
-	if (attempt.areAdjacent(4,2))
+	if (matrixGraph.areAdjacent(4,2))
 		cout << "son adyacentes" << endl;
 	else
 		cout << "no son adyacentes" << endl;
 		
-	attempt.findPath(0,1);
+	matrixGraph.findPath(0,5);
+	cout << endl;
+	matrixGraph.findPath(2,4);
+	cout << endl;
+	matrixGraph.findPath(1,7);
+	cout << endl;
+	
+	// ejercicios con lista de adyacencia y peso
+	vector<vector<pair<int,int>>> list(8);
+	ListGraph listGraph(list);
+	
+	listGraph.AddEdge(0, 1, 4);
+	listGraph.AddEdge(0, 4, 12);
+	listGraph.AddEdge(1, 2, 8);
+	listGraph.AddEdge(1, 4, 11);
+	listGraph.AddEdge(2, 2, 7);
+	listGraph.AddEdge(2, 5, 4);
+	listGraph.AddEdge(2, 7, 7);
+	listGraph.AddEdge(3, 4, 9);
+	listGraph.AddEdge(3, 5, 14);
+	listGraph.AddEdge(4, 5, 10);
+	listGraph.AddEdge(5, 6, 2);
+	listGraph.AddEdge(6, 7, 6);
+	
+	listGraph.PrintGraph();
+	
+	if (listGraph.AreAdjacent(1,3))
+		cout << "Son Adyacentes" << endl;
+	else
+		cout << "No Son Adyacentes" << endl;
+		
+	if (listGraph.AreAdjacent(4,2))
+		cout << "son adyacentes" << endl;
+	else
+		cout << "no son adyacentes" << endl;
+		
+	if (listGraph.FindPath(0,5))
+		cout << "Existe Camino";
 	
 	return 0;
 }
