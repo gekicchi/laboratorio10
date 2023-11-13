@@ -62,7 +62,7 @@ class MatrixGraph
 				
 				if (curr == end)
 				{
-					cout << "Camino Encontrado: ";
+					cout << "Camino Encontrado entre " << start << " y " << end << ": ";
 					for (int i=end; i != -1; i = parent[i])
 						path.push_back(i);
 						
@@ -184,14 +184,14 @@ int main()
 	matrixGraph.printGraph();
 	
 	if (matrixGraph.areAdjacent(1,3))
-		cout << "Son Adyacentes" << endl;
+		cout << "1 y 3 Son Adyacentes" << endl;
 	else
-		cout << "No Son Adyacentes" << endl;
+		cout << "1 y 3 No Son Adyacentes" << endl;
 		
 	if (matrixGraph.areAdjacent(4,2))
-		cout << "son adyacentes" << endl;
+		cout << "4 y 2 Son Adyacentes" << endl;
 	else
-		cout << "no son adyacentes" << endl;
+		cout << "4 y 2 No Son Adyacentes" << endl;
 		
 	matrixGraph.findPath(0,5);
 	cout << endl;
@@ -230,7 +230,7 @@ int main()
 		cout << "no son adyacentes" << endl;
 		
 	if (listGraph.FindPath(0,5))
-		cout << "Existe Camino";
+		cout << "Existe Camino entre 0 y 5";
 	
 	return 0;
 }
